@@ -1,6 +1,7 @@
 from statsforecast.core import StatsForecast
 from mlforecast.utils import PredictionIntervals
 from neuralforecast import NeuralForecast
+from neuralforecast.utils import PredictionIntervals as NeuralPredictionIntervals
 
 
 def train_statsforecast_model(model, df, freq, h, fitted=True):
@@ -38,8 +39,9 @@ def train_ml_model(model, df, h, level):
     """
     if "neuralforecast" in str(model.__class__).lower():
         nf = NeuralForecast(models=[model], freq="MS")
-        nf.fit(df=df)
-        forecast = nf.predict()
+        prediction_intervals = NeuralPredictionIntervals()
+        nf.fit(df=df, prediction_intervals=prediction_intervals)
+        forecast = nf.predict(level=level)
         insample = nf.predict_insample(step_size=h)
     else:  # MLForecast
         model.fit(
